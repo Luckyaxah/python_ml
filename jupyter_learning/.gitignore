@@ -3,3 +3,5 @@
 *.egg
 .DS_Store
 __pycache__/
+.vscode
+.ipynb_*
