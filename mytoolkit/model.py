@@ -13,48 +13,43 @@ class LinearRegressionModel:
         self.observed_x = features
         self.observed_y = target
         self.params = []
-        # self.params = np.array([-1,-1])[:, np.newaxis]
-
         self.error = None
         self.errors = []
     
     def train(self, method='bgd', **kwargs):
         x = np.concatenate( (np.ones((self.sample_num,1)), self.observed_x), axis = 1)
-
         if method == 'bgd':
             if 'alpha' in kwargs:
                 alpha = kwargs['alpha']
             else:
-                alpha = 0.001
-            if 'max_iterations' in kwargs:
-                max_iterations = kwargs['max_iterations']
+                alpha = 0.01
+            if 'max_iterations1' in kwargs:
+                max_iterations1 = kwargs['max_iterations1']
             else:
-                max_iterations = 1000
+                max_iterations1 = 10000
             if 'initial_params' in kwargs:
                 self.params = LinearRegressionModel.to_col_vec(kwargs['initial_params'])
             else:
                 self.params = np.array([np.random.rand() for i in range(self.params_num)])[:, np.newaxis]
-
             count = 0
             converged_flag = False
             epsilon = 1e-5
             self.errors = []
-            while count < max_iterations:
+            while True:
                 count += 1
                 # 梯度的负方向
                 self.error = np.sum((np.dot(x, self.params) - self.observed_y) ** 2)/ self.sample_num
                 self.errors.append(self.error)
                 if(self.error < epsilon):
                     converged_flag = True
-                if converged_flag:
+                if converged_flag or max_iterations1< count:
                     break
-                
-                self.grad = [[0] for j in range(self.params_num)]
+                self.grad = [0 for j in range(self.params_num)]
                 for j in range(self.params_num):
                     y_diff = np.dot(x, self.params) - self.observed_y
                     x_j = x[:,j][:,np.newaxis]
-                    self.grad[j][0] = 2 * np.sum(np.multiply(y_diff, x_j))
-                self.grad = np.array(self.grad)
+                    self.grad[j] = 2 * np.sum(np.multiply(y_diff, x_j))/ self.sample_num
+                self.grad = np.array(self.grad)[:, np.newaxis]
                 self.params = self.params - alpha * self.grad
 
         elif method == 'sbgd':
