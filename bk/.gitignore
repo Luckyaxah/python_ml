@@ -1,0 +1,8 @@
+.Python
+.installed.cfg
+*.egg
+.DS_Store
+__pycache__/
+.vscode
+.ipynb_*
+cache
